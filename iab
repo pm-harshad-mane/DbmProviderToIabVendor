@@ -1,0 +1,31 @@
+package main
+
+import(
+	"encoding/json"
+)
+
+type IabVendor struct {
+	Id 								int 	`json:"id"`
+	Name 							string 	`json:"name"`
+	PolicyUrl						string 	`json:"policyUrl"`
+	PurposeIds						[]int 	`json:"purposeIds"`
+	LegitimateInterestPurposeIds	[]int 	`json:"legIntPurposeIds"`
+	FeatureIds						[]int	`json:"featureIds"`
+}
+
+type IabJson struct {
+	// Version uint16 	`json:"vendorListVersion"`
+	Vendors []IabVendor `json:"vendors"`
+}
+
+type DomainToIabVendorMap map[string]IabVendor
+
+func generateIabMap(aJsonString string) (DomainToIabVendorMap) {
+	aDomainToIabVendorMap := make(DomainToIabVendorMap)
+	var iabJson IabJson
+	json.Unmarshal([]byte(aJsonString), &iabJson)
+	for _, iabVendor := range iabJson.Vendors {
+		aDomainToIabVendorMap[ getDomainFromUrl(iabVendor.PolicyUrl) ] = iabVendor			
+	}	
+	return aDomainToIabVendorMap
+}
